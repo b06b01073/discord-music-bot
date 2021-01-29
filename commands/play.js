@@ -2,12 +2,22 @@ const ytdl = require("ytdl-core");
 const ytSearch = require("yt-search");
 const validUrl = require("valid-url");
 
-const playMusic = (url, connection, channel) => {
-  const stream = ytdl(url, { filter: "audioonly" });
-  console.log(stream);
+// test music https://www.youtube.com/watch?v=QF08nvtHHCY&ab_channel=Black%26White
 
-  connection.play(stream, { seek: 0, volume: 1 }).on("finish", () => {
-    channel.leave();
+const playMusic = (url, connection, queue) => {
+  const stream = ytdl(url, { filter: "audioonly" });
+
+  queue.push(stream);
+  if (queue.length === 1) {
+    play(connection, queue);
+  }
+};
+
+const play = (connection, queue) => {
+  if (!queue.length) return;
+  connection.play(queue[0], { seek: 0, volumn: 1 }).on("finish", () => {
+    queue.shift();
+    play(connection, queue);
   });
 };
 
@@ -15,7 +25,10 @@ module.exports = {
   name: "play",
   description: "Play a song from Youtube",
   example: "!play <Youtube link | keyword>",
-  async execute(message, args) {
+  async execute(message, args, queue) {
+    // note that this queue is from index.js
+    console.log(queue);
+
     const channel = message.member.voice.channel;
 
     if (!channel) {
@@ -39,7 +52,7 @@ module.exports = {
 
     if (isValidUrl) {
       try {
-        return playMusic(args[0], connection, channel);
+        return playMusic(args[0], connection, queue);
       } catch (err) {
         return message.channel.send(
           `message occurred with error message: ${err}`
@@ -55,8 +68,8 @@ module.exports = {
       const video = await searchMusic(args.join(" "));
 
       if (video) {
-        await message.reply(`Now playing ${video.title}`);
-        return playMusic(video.url, connection, channel);
+        await message.reply(`**${video.title}** is added to the list!`);
+        return playMusic(video.url, connection, queue);
       }
     }
 
