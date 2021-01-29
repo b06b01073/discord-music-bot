@@ -2,13 +2,14 @@ const dotenv = require("dotenv");
 const Discord = require("discord.js");
 const fs = require("fs");
 const express = require("express");
+const path = require("path");
 const app = express();
 dotenv.config();
 
 let port = process.env.PORT || 4000;
 
 app.get("/", (req, res) => {
-  token = process.env.TOKEN;
+  token = process.env.BOT_TOKEN;
   prefix = process.env.PREFIX;
 
   //client is an instance of the Client class
@@ -22,11 +23,11 @@ app.get("/", (req, res) => {
     console.log(`Logged in as ${client.user.tag}!`);
 
     const commandFiles = fs
-      .readdirSync("./commands")
+      .readdirSync(path.resolve(__dirname, "commands"))
       .filter((fileName) => fileName.endsWith(".js"));
 
     for (let commandFile of commandFiles) {
-      let file = require(`./commands/${commandFile}`);
+      let file = require(path.resolve(__dirname, "commands", commandFile));
       client.commands.set(file.name, file);
     }
   });
