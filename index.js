@@ -9,7 +9,12 @@ dotenv.config();
 
 let port = process.env.PORT || 4000;
 
+let hasStart = false;
+
 app.get("/start", (req, res) => {
+  if (hasStart) return res.send("Bot is already running");
+  else hasStart = true;
+
   console.log(`App is running at port: ${port}`);
   token = process.env.BOT_TOKEN;
   prefix = process.env.PREFIX;
