@@ -72,6 +72,12 @@ app.listen(port, () => {
     if (raw.startsWith("嚶")) {
       message.reply("嚶嚶嚶");
     }
+    if (raw.startsWith("哈")) {
+      message.reply("嘻嘻");
+    }
+    if (raw.startsWith("嘻嘻")) {
+      message.replay("哈");
+    }
 
     // parsing command
     const args = message.content.slice(prefix.length).trim().split(/\s+/);
