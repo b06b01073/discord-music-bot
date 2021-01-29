@@ -11,7 +11,7 @@ let hasStart = false;
 let dispatcher;
 
 app.get("/", (req, res) => {
-  if (hasStart) return res.send("Bot is already running");
+  if (hasStart) return res.sendFile(path.resolve(__dirname, "index.html"));
   else hasStart = true;
 
   console.log(`App is running at port: ${port}`);
@@ -126,7 +126,7 @@ app.get("/", (req, res) => {
   });
 
   client.login(token);
-  res.send("ok");
+  res.sendFile(path.resolve(__dirname, "index.html"));
 });
 
 app.listen(port, () => {
