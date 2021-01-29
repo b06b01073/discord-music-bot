@@ -11,7 +11,7 @@ let port = process.env.PORT || 4000;
 
 let hasStart = false;
 
-app.get("/start", (req, res) => {
+app.get("/", (req, res) => {
   if (hasStart) return res.send("Bot is already running");
   else hasStart = true;
 
