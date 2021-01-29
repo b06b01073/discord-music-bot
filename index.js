@@ -15,7 +15,6 @@ app.get("/", (req, res) => {
   //client is an instance of the Client class
   const client = new Discord.Client();
   client.commands = new Discord.Collection();
-  client.queue = [];
 
   // console.log(process.env.TOKEN);
 
