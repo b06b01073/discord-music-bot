@@ -7,8 +7,8 @@ const app = express();
 dotenv.config();
 
 let port = process.env.PORT || 4000;
-let queue = [];
 let hasStart = false;
+let dispatcher;
 
 app.get("/", (req, res) => {
   if (hasStart) return res.send("Bot is already running");
@@ -21,6 +21,7 @@ app.get("/", (req, res) => {
   //client is an instance of the Client class
   const client = new Discord.Client();
   client.commands = new Discord.Collection();
+  client.queue = [];
 
   // console.log(process.env.TOKEN);
 
@@ -102,7 +103,10 @@ app.get("/", (req, res) => {
     } else if (command === "play") {
       if (client.commands.has("play")) {
         try {
-          client.commands.get("play").execute(message, args, queue);
+          await client.commands
+            .get("play")
+            .execute(message, args, client.queue, dispatcher);
+          console.log("index.js", dispatcher);
         } catch (err) {
           message.channel.send(
             `> error occured with message \`\`\`${err}\`\`\``
@@ -111,8 +115,12 @@ app.get("/", (req, res) => {
       }
     } else if (command === "quit") {
       if (client.commands.has("quit")) {
-        queue = [];
+        client.queue = [];
         client.commands.get("quit").execute(message, args);
+      }
+    } else if (command === "skip") {
+      if (client.commands.has("skip")) {
+        client.commands.get("skip").execute(message, args, dispatcher);
       }
     }
   });
