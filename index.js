@@ -3,16 +3,13 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const express = require("express");
 const path = require("path");
+const { Server } = require("http");
 const app = express();
 dotenv.config();
 
 let port = process.env.PORT || 4000;
 
-app.get("/", (req, res) => {
-  res.send("ok");
-});
-
-app.listen(port, () => {
+app.get("/start", (req, res) => {
   console.log(`App is running at port: ${port}`);
   token = process.env.BOT_TOKEN;
   prefix = process.env.PREFIX;
@@ -114,8 +111,15 @@ app.listen(port, () => {
       if (client.commands.has("quit")) {
         client.commands.get("quit").execute(message, args);
       }
+    } else if (command === "close") {
+      return;
     }
   });
 
   client.login(token);
+  res.send("ok");
+});
+
+app.listen(port, () => {
+  console.log("start server");
 });

@@ -5,6 +5,7 @@ const validUrl = require("valid-url");
 const playMusic = (url, connection, channel) => {
   const stream = ytdl(url, { filter: "audioonly" });
   console.log(stream);
+
   connection.play(stream, { seek: 0, volume: 1 }).on("finish", () => {
     channel.leave();
   });
