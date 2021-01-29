@@ -8,7 +8,12 @@ dotenv.config();
 
 let port = process.env.PORT || 4000;
 
-app.get("/", (req, res) => {
+// app.get("/", (req, res) => {
+
+// });
+
+app.listen(port, () => {
+  console.log(`App is running at port: ${port}`);
   token = process.env.BOT_TOKEN;
   prefix = process.env.PREFIX;
 
@@ -107,9 +112,4 @@ app.get("/", (req, res) => {
   });
 
   client.login(token);
-  res.send("connected");
-});
-
-app.listen(port, () => {
-  console.log(`App is running at port: ${port}`);
 });
