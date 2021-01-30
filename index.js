@@ -66,7 +66,7 @@ app.get("/", (req, res) => {
           );
         }
       }
-    } else if (command === "play" || command === "p" || command === "k") {
+    } else if (command === "play" || command === "p") {
       if (client.commands.has("play")) {
         try {
           await client.commands
