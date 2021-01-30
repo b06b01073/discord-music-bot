@@ -7,9 +7,7 @@ module.exports = {
     const channel = message.member.voice.channel;
 
     if (!channel) {
-      return message.reply(
-        "You need to be in a voice channel for this command!!!"
-      );
+      return message.reply("You need to be in a voice channel first");
     }
 
     await channel.leave();

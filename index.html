@@ -3,17 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+  <style>
+    body {
+      font-family: 'Roboto';font-size: 22px;
+    }
+  </style>
   <title>Chiwawa</title>
 </head>
 <body>
-  <h1>A Brief guide</h1>
+  <h1>A Brief Guide</h1>
 
-  <h2>Prefix of command is ! (指令需要驚嘆號前綴)</h2>
+  <h2>Prefix of command is <span style="color: red">!</span> (指令需要驚嘆號前綴)</h2>
 
   <ul>
     <li>
+      <h2>Help</h2>
+      <code style="font-size: 20px;">&lt;!help | !h&gt; </code>
+      <p>Description: Print the link of this page in discord channel.</p>
+    </li>
+    <li>
       <h2>Play music</h2>
-      <code style="font-size: 20px;">!play &lt; youtube link | keyword &gt; </code>
+      <code style="font-size: 20px;">&lt;!play | !p&gt; &lt;youtube link | keyword&gt; </code>
       <p>Description: Play a song from Youtube</p>
       <p>Example: 
         <ol>
@@ -25,12 +36,12 @@
     </li>
     <li>
       <h2>Skip</h2>
-      <code style="font-size: 20px;">!skip </code>
+      <code style="font-size: 20px;">&lt;!skip | !s&gt; </code>
       <p>Description: Skip currently playing music</p>
     </li>
     <li>
       <h2>Quit</h2>
-      <code style="font-size: 20px;">!quit </code>
+      <code style="font-size: 20px;">&lt;!quit | !q&gt;</code>
       <p>Description: Make the bot leave the voice channel.</p>
     </li>
   </ul>

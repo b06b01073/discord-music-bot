@@ -1,24 +1,45 @@
 const ytdl = require("ytdl-core");
 const ytSearch = require("yt-search");
 const validUrl = require("valid-url");
+const path = require("path");
+const { google } = require("googleapis");
+const { title } = require("process");
+const idParser = require(path.resolve(__dirname, "utils", "idParser.js"));
 
 // test music https://www.youtube.com/watch?v=QF08nvtHHCY&ab_channel=Black%26White
 
-const playMusic = (url, connection, queue) => {
+const playMusic = async (url, connection, queue, title, message) => {
   const stream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
+
+  const id = idParser(url);
+
+  google
+    .youtube("v3")
+    .videos.list({
+      key: process.env.YOUTUBE_KEY,
+      part: "snippet",
+      id: id,
+    })
+    .then((res) => {
+      const songTitle = res.data.items[0].snippet.title;
+      title.push(songTitle);
+      message.reply(`**${songTitle}** is added to the list!`);
+    })
+    .catch((err) => console.log(err));
 
   queue.push(stream);
   if (queue.length === 1) {
-    play(connection, queue);
+    play(connection, queue, title);
   }
 };
 
 // use recursion to play songs, what about iterative solution(?).
-const play = (connection, queue) => {
+const play = (connection, queue, title) => {
   if (!queue.length) return;
   connection.play(queue[0], { seek: 0, volumn: 1 }).on("finish", () => {
     queue.shift();
-    play(connection, queue);
+    title.shift();
+    play(connection, queue, title);
   });
 };
 
@@ -26,7 +47,7 @@ module.exports = {
   name: "play",
   description: "Play a song from Youtube",
   example: "!play <Youtube link | keyword>",
-  async execute(message, args, queue) {
+  async execute(message, args, queue, title) {
     // note that this queue is from index.js
     const channel = message.member.voice.channel;
 
@@ -51,7 +72,7 @@ module.exports = {
 
     if (isValidUrl) {
       try {
-        return playMusic(args[0], connection, queue);
+        return playMusic(args[0], connection, queue, title, message);
       } catch (err) {
         return message.channel.send(
           `message occurred with error message: ${err}`
@@ -63,11 +84,11 @@ module.exports = {
 
         let msg = []; // message of search result
 
-        for (let i = 0; i < Math.min(5, videoResult.videos.length); i++) {
-          msg.push(`${i + 1}. ${videoResult.videos[i].title}`);
-        }
+        // for (let i = 0; i < Math.min(5, videoResult.videos.length); i++) {
+        //   msg.push(`${i + 1}. ${videoResult.videos[i].title}`);
+        // }
 
-        message.channel.send(msg);
+        // message.channel.send(msg);
 
         return Object.keys(videoResult).length ? videoResult.videos[0] : null;
       };
@@ -75,8 +96,7 @@ module.exports = {
       const video = await searchMusic(args.join(" "));
 
       if (video) {
-        await message.reply(`**${video.title}** is added to the list!`);
-        return playMusic(video.url, connection, queue);
+        return playMusic(video.url, connection, queue, title, message);
       }
     }
 
