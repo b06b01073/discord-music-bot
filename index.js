@@ -5,7 +5,6 @@ const express = require("express");
 const path = require("path");
 const app = express();
 dotenv.config();
-
 let port = process.env.PORT || 4000;
 let hasStart = false;
 
