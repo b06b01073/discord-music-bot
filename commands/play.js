@@ -61,6 +61,14 @@ module.exports = {
       const searchMusic = async (query) => {
         const videoResult = await ytSearch(query);
 
+        let msg = []; // message of search result
+
+        for (let i = 0; i < Math.min(5, videoResult.videos.length); i++) {
+          msg.push(`${i + 1}. ${videoResult.videos[i].title}`);
+        }
+
+        message.channel.send(msg);
+
         return Object.keys(videoResult).length ? videoResult.videos[0] : null;
       };
 
