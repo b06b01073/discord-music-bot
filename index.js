@@ -86,7 +86,7 @@ app.get("/", (req, res) => {
       }
     } else if (command === "skip" || command === "s") {
       if (client.commands.has("skip")) {
-        client.commands.get("skip").execute(message, args, title);
+        client.commands.get("skip").execute(message, args, client.title);
       }
     } else if (command === "list" || command === "ls" || command === "l") {
       if (client.commands.has("list")) {
