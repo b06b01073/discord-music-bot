@@ -1,5 +1,4 @@
 const dotenv = require("dotenv");
-const Discord = require("discord.js");
 const fs = require("fs");
 const express = require("express");
 const path = require("path");
@@ -8,6 +7,7 @@ const app = express();
 dotenv.config();
 let port = process.env.PORT || 4000;
 let hasStart = false;
+const Discord = require("discord.js");
 
 app.get("/", (req, res) => {
   if (hasStart) return res.sendFile(path.resolve(__dirname, "index.html"));
@@ -66,7 +66,7 @@ app.get("/", (req, res) => {
           );
         }
       }
-    } else if (command === "play" || command === "p") {
+    } else if (command === "play" || command === "p" || command === "k") {
       if (client.commands.has("play")) {
         try {
           await client.commands
