@@ -4,32 +4,29 @@ const validUrl = require("valid-url");
 
 // test music https://www.youtube.com/watch?v=QF08nvtHHCY&ab_channel=Black%26White
 
-const playMusic = (url, connection, queue, dispatcher) => {
+const playMusic = (url, connection, queue) => {
   const stream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
 
   queue.push(stream);
   if (queue.length === 1) {
-    play(connection, queue, dispatcher);
+    play(connection, queue);
   }
 };
 
 // use recursion to play songs, what about iterative solution(?).
-const play = (connection, queue, dispatcher) => {
+const play = (connection, queue) => {
   if (!queue.length) return;
-  dispatcher = connection
-    .play(queue[0], { seek: 0, volumn: 1 })
-    .on("finish", () => {
-      queue.shift();
-      play(connection, queue, dispatcher);
-    });
-  // console.log(connection.dispatcher);
+  connection.play(queue[0], { seek: 0, volumn: 1 }).on("finish", () => {
+    queue.shift();
+    play(connection, queue);
+  });
 };
 
 module.exports = {
   name: "play",
   description: "Play a song from Youtube",
   example: "!play <Youtube link | keyword>",
-  async execute(message, args, queue, dispatcher) {
+  async execute(message, args, queue) {
     // note that this queue is from index.js
     const channel = message.member.voice.channel;
 
@@ -54,7 +51,7 @@ module.exports = {
 
     if (isValidUrl) {
       try {
-        return playMusic(args[0], connection, queue, dispatcher);
+        return playMusic(args[0], connection, queue);
       } catch (err) {
         return message.channel.send(
           `message occurred with error message: ${err}`

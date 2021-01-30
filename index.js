@@ -8,13 +8,11 @@ dotenv.config();
 
 let port = process.env.PORT || 4000;
 let hasStart = false;
-let dispatcher;
 
 app.get("/", (req, res) => {
   if (hasStart) return res.sendFile(path.resolve(__dirname, "index.html"));
   else hasStart = true;
 
-  console.log(`App is running at port: ${port}`);
   token = process.env.BOT_TOKEN;
   prefix = process.env.PREFIX;
 
@@ -28,6 +26,7 @@ app.get("/", (req, res) => {
   client.once("ready", async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
+    // reading command files from commands folder
     const commandFiles = fs
       .readdirSync(path.resolve(__dirname, "commands"))
       .filter((fileName) => fileName.endsWith(".js"));
@@ -39,8 +38,10 @@ app.get("/", (req, res) => {
   });
 
   client.on("message", async (message) => {
+    // 在server端記錄所有訊息
     console.log(`[${message.author.tag}]:　${message.content}`);
 
+    // 不接收由機器人發出的訊息
     if (message.author.bot) return;
 
     const raw = message.content;
@@ -52,24 +53,6 @@ app.get("/", (req, res) => {
     if (raw === "好") {
       message.reply("好");
       return;
-    }
-    if (raw === "叔叔") {
-      message.channel.send(
-        `巨槌瑞斯` +
-          `
-      ⠄⠄⠄⠄⠄⠄⠄⠈⠉⠁⠈⠉⠉⠙⠿⣿⣿⣿⣿⣿
-      ⠄⠄⠄⠄⠄⠄⠄⠄⣀⣀⣀⠄⠄⠄⠄⠄⠹⣿⣿⣿ 
-      ⠄⠄⠄⠄⠄⢐⣲⣿⣿⣯⠭⠉⠙⠲⣄⡀⠄⠈⢿⣿
-      ⠐⠄⠄⠰⠒⠚⢩⣉⠼⡟⠙⠛⠿⡟⣤⡳⡀⠄⠄⢻
-      ⠄⠄⢀⣀⣀⣢⣶⣿⣦⣭⣤⣭⣵⣶⣿⣿⣏⠄⠄⣿
-      ⠄⣼⣿⣿⣿⡉⣿⣀⣽⣸⣿⣿⣿⣿⣿⣿⣿⡆⣀⣿
-      ⢠⣿⣿⣿⠿⠟⠛⠻⢿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣼
-      ⠄⣿⣿⣿⡆⠄⠄⠄⠄⠳⡈⣿⣿⣿⣿⣿⣿⣿⣿⣿
-      ⠄⢹⣿⣿⡇⠄⠄⠄⠄⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
-      ⠄⠄⢿⣿⣷⣨⣽⣭⢁⣡⣿⣿⠟⣩⣿⣿⣿⠿⠿⠟
-      ⠄⠄⠈⡍⠻⣿⣿⣿⣿⠟⠋⢁⣼⠿⠋⠉⠄⠄⠄⠄
-      ⠄⠄⠄⠈⠴⢬⣙⣛⡥⠴⠂⠄⠄⠄⠄⠄⠄⠄⠄⠄`
-      );
     }
     if (raw.startsWith("嚶")) {
       message.reply("嚶嚶嚶");
@@ -84,11 +67,9 @@ app.get("/", (req, res) => {
     // parsing command
     const args = message.content.slice(prefix.length).trim().split(/\s+/);
     const command = args.shift().toLowerCase();
-    // finish paring command
 
+    //確定command有prefix
     if (!raw.startsWith(prefix)) return;
-
-    // reading command files from commands folder
 
     if (command === "ping") {
       if (client.commands.has("ping")) {
@@ -100,28 +81,31 @@ app.get("/", (req, res) => {
           );
         }
       }
-    } else if (command === "play") {
+    } else if (command === "play" || command === "p") {
       if (client.commands.has("play")) {
         try {
           await client.commands
             .get("play")
-            .execute(message, args, client.queue, dispatcher);
-          console.log("index.js", dispatcher);
+            .execute(message, args, client.queue);
         } catch (err) {
           message.channel.send(
             `> error occured with message \`\`\`${err}\`\`\``
           );
         }
       }
-    } else if (command === "quit") {
+    } else if (command === "quit" || command === "q") {
       if (client.commands.has("quit")) {
         client.queue = [];
         client.commands.get("quit").execute(message, args);
       }
-    } else if (command === "skip") {
+    } else if (command === "skip" || command === "s") {
       if (client.commands.has("skip")) {
-        client.commands.get("skip").execute(message, args, dispatcher);
+        client.commands.get("skip").execute(message, args);
       }
+    } else if (command === "help" || command === "h") {
+      message.reply(
+        `You can check **https://chiwawabot.herokuapp.com/** for more info.`
+      );
     }
   });
 
@@ -130,5 +114,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("start server");
+  console.log(`server is running at port: ${port}`);
 });
