@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
   client.commands = new Discord.Collection();
   client.queue = [];
   client.title = [];
+  client.isWaiting = false;
 
   // console.log(process.env.TOKEN);
 
@@ -70,9 +71,15 @@ app.get("/", (req, res) => {
     } else if (command === "play" || command === "p" || command === "t") {
       if (client.commands.has("play")) {
         try {
-          await client.commands
+          client.isWaiting = await client.commands
             .get("play")
-            .execute(message, args, client.queue, client.title);
+            .execute(
+              message,
+              args,
+              client.queue,
+              client.title,
+              client.isWaiting
+            );
         } catch (err) {
           message.channel.send(
             `> error occured with message \`\`\`${err}\`\`\``

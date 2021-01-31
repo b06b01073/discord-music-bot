@@ -4,6 +4,11 @@ const validUrl = require("valid-url");
 const path = require("path");
 const { google } = require("googleapis");
 const { title } = require("process");
+const isValidIndex = require(path.resolve(
+  __dirname,
+  "utils",
+  "isValidIndex.js"
+));
 const idParser = require(path.resolve(__dirname, "utils", "idParser.js"));
 
 // test music https://www.youtube.com/watch?v=QF08nvtHHCY&ab_channel=Black%26White
@@ -50,7 +55,9 @@ module.exports = {
   name: "play",
   description: "Play a song from Youtube",
   example: "!play <Youtube link | keyword>",
-  async execute(message, args, queue, title) {
+  candidates: [],
+  async execute(message, args, queue, title, isWaiting) {
+    //isWaiting 代表使用者使用關鍵字查過影片，但是還沒有從中選歌
     // note that this queue is from index.js
     const channel = message.member.voice.channel;
 
@@ -75,34 +82,58 @@ module.exports = {
 
     if (isValidUrl) {
       try {
-        return playMusic(args[0], connection, queue, title, message);
+        playMusic(args[0], connection, queue, title, message);
       } catch (err) {
-        return message.channel.send(
-          `message occurred with error message: ${err}`
-        );
+        message.channel.send(`error occurred with error message: ${err}`);
       }
+
+      // 使用url播放不影響另外一個播歌方式
+      return isWaiting;
     } else {
-      const searchMusic = async (query) => {
-        const videoResult = await ytSearch(query);
+      if (isWaiting && isValidIndex(args, this.candidates.length)) {
+        const index = Number(args[0]);
+        playMusic(
+          this.candidates[index - 1],
+          connection,
+          queue,
+          title,
+          message
+        );
 
-        let msg = []; // message of search result
+        //如果從目前的選擇清單選擇了，就清空目前的選擇清單，並且將目前的狀態改為沒有在等待
+        this.candidates = [];
+        return false;
+      } else {
+        const searchMusic = async (query) => {
+          const videoResult = await ytSearch(query);
 
-        for (let i = 0; i < Math.min(5, videoResult.videos.length); i++) {
-          msg.push(`${i + 1}. ${videoResult.videos[i].title}`);
+          let msg = []; // message of search result
+
+          for (let i = 0; i < Math.min(5, videoResult.videos.length); i++) {
+            msg.push(`${i + 1}. ${videoResult.videos[i].title}`);
+          }
+
+          message.channel.send(msg);
+
+          return Object.keys(videoResult).length
+            ? videoResult.videos.slice(0, 5)
+            : null;
+        };
+
+        const video = await searchMusic(args.join(" "));
+
+        if (!video) {
+          message.reply("No results found :grinning:");
+
+          // 如果用新的關鍵字沒有找到歌，就不更新等待狀態跟選擇清單
+          return isWaiting;
         }
 
-        message.channel.send(msg);
-
-        return Object.keys(videoResult).length ? videoResult.videos[0] : null;
-      };
-
-      const video = await searchMusic(args.join(" "));
-
-      if (video) {
-        return playMusic(video.url, connection, queue, title, message);
+        // 如果用新的關鍵字找到了新歌，就清空目前的選擇清單重新填入，然後將等待狀態設成true
+        this.candidates = [];
+        video.forEach((v) => this.candidates.push(v.url));
+        return true;
       }
     }
-
-    return message.reply("No results found :grinning:");
   },
 };
