@@ -9,11 +9,14 @@ const idParser = require(path.resolve(__dirname, "utils", "idParser.js"));
 // test music https://www.youtube.com/watch?v=QF08nvtHHCY&ab_channel=Black%26White
 
 const playMusic = async (url, connection, queue, title, message) => {
-  const stream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
+  const stream = await ytdl(url, {
+    filter: "audioonly",
+    quality: "highestaudio",
+  });
 
   const id = idParser(url);
 
-  google
+  await google
     .youtube("v3")
     .videos.list({
       key: process.env.YOUTUBE_KEY,
@@ -84,11 +87,11 @@ module.exports = {
 
         let msg = []; // message of search result
 
-        // for (let i = 0; i < Math.min(5, videoResult.videos.length); i++) {
-        //   msg.push(`${i + 1}. ${videoResult.videos[i].title}`);
-        // }
+        for (let i = 0; i < Math.min(5, videoResult.videos.length); i++) {
+          msg.push(`${i + 1}. ${videoResult.videos[i].title}`);
+        }
 
-        // message.channel.send(msg);
+        message.channel.send(msg);
 
         return Object.keys(videoResult).length ? videoResult.videos[0] : null;
       };

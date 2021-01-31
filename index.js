@@ -9,6 +9,7 @@ let port = process.env.PORT || 4000;
 let hasStart = false;
 const Discord = require("discord.js");
 
+// 這邊目前有一個問題是，不同的伺服器給bot指令時會混在一起，一個解決辦法是帶入mongo db來分別記錄
 app.get("/", (req, res) => {
   if (hasStart) return res.sendFile(path.resolve(__dirname, "index.html"));
   else hasStart = true;
@@ -66,7 +67,7 @@ app.get("/", (req, res) => {
           );
         }
       }
-    } else if (command === "play" || command === "p" || command === "k") {
+    } else if (command === "play" || command === "p" || command === "t") {
       if (client.commands.has("play")) {
         try {
           await client.commands
