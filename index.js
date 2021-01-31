@@ -8,12 +8,9 @@ dotenv.config();
 let port = process.env.PORT || 4000;
 let hasStart = false;
 const Discord = require("discord.js");
-const { send } = require("process");
 
 // 這邊目前有一個問題是，不同的伺服器給bot指令時會混在一起，一個解決辦法是帶入mongo db來分別記錄
 app.get("/", (req, res) => {
-  if (hasStart) return res.sendFile(path.resolve(__dirname, "index.html"));
-  else hasStart = true;
   return res.sendFile(path.resolve(__dirname, "index.html"));
 });
 app.listen(port, () => {
@@ -28,9 +25,7 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.queue = [];
 client.title = [];
-client.isWaiting = false;
-
-// console.log(process.env.TOKEN);
+client.userWaiting = new Map();
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -53,6 +48,7 @@ client.on("message", async (message) => {
   // 不接收由機器人發出的訊息
   if (message.author.bot) return;
 
+  const userId = message.author.id;
   const raw = message.content;
 
   if (rawCommands.execute(message, raw)) return;
@@ -72,12 +68,15 @@ client.on("message", async (message) => {
         message.channel.send(`> error occured with message \`\`\`${err}\`\`\``);
       }
     }
-  } else if (command === "play" || command === "p" || command === "t") {
+  } else if (command === "play" || command === "p" || command === "j") {
     if (client.commands.has("play")) {
+      if (!client.userWaiting.has(userId)) {
+        client.userWaiting.set(userId, false);
+      }
       try {
-        client.isWaiting = await client.commands
+        client.userWaiting.userId = await client.commands
           .get("play")
-          .execute(message, args, client.queue, client.title, client.isWaiting);
+          .execute(message, args, client.queue, client.title, userId);
       } catch (err) {
         message.channel.send(`> error occured with message \`\`\`${err}\`\`\``);
       }
@@ -92,7 +91,12 @@ client.on("message", async (message) => {
     if (client.commands.has("skip")) {
       client.commands.get("skip").execute(message, client.title);
     }
-  } else if (command === "list" || command === "ls" || command === "l") {
+  } else if (
+    command === "list" ||
+    command === "ls" ||
+    command === "l" ||
+    command === "k"
+  ) {
     if (client.commands.has("list")) {
       client.commands.get("list").execute(message, client.title);
     }
@@ -104,6 +108,3 @@ client.on("message", async (message) => {
 });
 
 client.login(token);
-
-// res.sendFile(path.resolve(__dirname, "index.html"));
-// });

@@ -3,7 +3,6 @@ module.exports = {
   description: "Show the current playlist.",
   execute(message, title) {
     let result = "";
-    console.log(title);
 
     if (title.length === 0) {
       return message.reply("Playlist is empty : (");

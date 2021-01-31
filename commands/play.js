@@ -12,6 +12,7 @@ const isValidIndex = require(path.resolve(
 const idParser = require(path.resolve(__dirname, "utils", "idParser.js"));
 
 // test music https://www.youtube.com/watch?v=QF08nvtHHCY&ab_channel=Black%26White
+// 在選擇歌曲的過程中，不同使用者的指令會互相打結，需要做的事情有，將不同使用者的candidate區分開來，每個使用者只能access自己的candidate
 
 const playMusic = async (url, connection, queue, title, message) => {
   const stream = await ytdl(url, {
@@ -55,10 +56,10 @@ module.exports = {
   name: "play",
   description: "Play a song from Youtube",
   example: "!play <Youtube link | keyword>",
-  candidates: [],
-  async execute(message, args, queue, title, isWaiting) {
+  candidates: new Map(),
+  isWaiting: new Map(),
+  async execute(message, args, queue, title, userId) {
     //isWaiting 代表使用者使用關鍵字查過影片，但是還沒有從中選歌
-    // note that this queue is from index.js
     const channel = message.member.voice.channel;
 
     if (!channel) {
@@ -78,6 +79,8 @@ module.exports = {
     // make the bot join the channel
     const connection = await channel.join();
 
+    // userId is the id of the message author
+
     const isValidUrl = validUrl.isHttpsUri(args[0]); // return original url if it is valid, otherwise return undefined
 
     if (isValidUrl) {
@@ -86,14 +89,19 @@ module.exports = {
       } catch (err) {
         message.channel.send(`error occurred with error message: ${err}`);
       }
-
-      // 使用url播放不影響另外一個播歌方式
-      return isWaiting;
     } else {
-      if (isWaiting && isValidIndex(args, this.candidates.length)) {
+      //如果這個使用者沒有選擇清單的話，幫這個使用者初始化一個空的選擇清單
+      if (this.candidates.get(userId) === undefined) {
+        this.candidates.set(userId, []);
+      }
+
+      if (
+        this.isWaiting.get(userId) &&
+        isValidIndex(args, this.candidates.get(userId).length)
+      ) {
         const index = Number(args[0]);
         playMusic(
-          this.candidates[index - 1],
+          this.candidates.get(userId)[index - 1],
           connection,
           queue,
           title,
@@ -102,8 +110,7 @@ module.exports = {
 
         //如果從目前的選擇清單選擇了，就清空目前的選擇清單，並且將目前的狀態改為沒有在等待
         //目前的問題是，如果多人一起輸入的話會出問題
-        this.candidates = [];
-        return false;
+        this.candidates.set(userId, []);
       } else {
         const searchMusic = async (query) => {
           const videoResult = await ytSearch(query);
@@ -127,13 +134,13 @@ module.exports = {
           message.reply("No results found :grinning:");
 
           // 如果用新的關鍵字沒有找到歌，就不更新等待狀態跟選擇清單
-          return isWaiting;
+          return;
         }
         message.channel.send(`> 使用 !p + 數字 來選歌`);
         // 如果用新的關鍵字找到了新歌，就清空目前的選擇清單重新填入，然後將等待狀態設成true
-        this.candidates = [];
-        video.forEach((v) => this.candidates.push(v.url));
-        return true;
+        this.candidates.set(userId, []);
+        this.isWaiting.set(userId, true);
+        video.forEach((v) => this.candidates.get(userId).push(v.url));
       }
     }
   },
