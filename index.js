@@ -68,7 +68,7 @@ client.on("message", async (message) => {
         message.channel.send(`> error occured with message \`\`\`${err}\`\`\``);
       }
     }
-  } else if (command === "play" || command === "p" || command === "j") {
+  } else if (command === "play" || command === "p") {
     if (client.commands.has("play")) {
       if (!client.userWaiting.has(userId)) {
         client.userWaiting.set(userId, false);
@@ -91,12 +91,7 @@ client.on("message", async (message) => {
     if (client.commands.has("skip")) {
       client.commands.get("skip").execute(message, client.title);
     }
-  } else if (
-    command === "list" ||
-    command === "ls" ||
-    command === "l" ||
-    command === "k"
-  ) {
+  } else if (command === "list" || command === "ls" || command === "l") {
     if (client.commands.has("list")) {
       client.commands.get("list").execute(message, client.title);
     }
