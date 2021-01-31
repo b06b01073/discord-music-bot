@@ -3,7 +3,7 @@ const { VoiceChannel } = require("discord.js");
 module.exports = {
   name: "quit",
   description: "Make bot quit from current voice channel",
-  async execute(message, args) {
+  async execute(message) {
     const channel = message.member.voice.channel;
 
     if (!channel) {

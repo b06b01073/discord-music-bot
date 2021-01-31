@@ -90,11 +90,11 @@ app.get("/", (req, res) => {
       if (client.commands.has("quit")) {
         client.queue = [];
         client.title = [];
-        client.commands.get("quit").execute(message, args);
+        client.commands.get("quit").execute(message);
       }
     } else if (command === "skip" || command === "s") {
       if (client.commands.has("skip")) {
-        client.commands.get("skip").execute(message, args, client.title);
+        client.commands.get("skip").execute(message, client.title);
       }
     } else if (command === "list" || command === "ls" || command === "l") {
       if (client.commands.has("list")) {

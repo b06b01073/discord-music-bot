@@ -3,7 +3,7 @@ const { BroadcastDispatcher } = require("discord.js");
 module.exports = {
   name: "skip",
   description: "skip the current song",
-  async execute(message, args, title) {
+  async execute(message, title) {
     const channel = message.member.voice.channel;
     if (!channel) {
       return message.reply("You need to be in a voice channel!");
