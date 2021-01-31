@@ -15,7 +15,6 @@ module.exports = {
     if (connection.dispatcher) {
       connection.dispatcher.end();
       message.channel.send(`${title[0]} 已經被跳過`);
-      title.shift();
     }
   },
 };
