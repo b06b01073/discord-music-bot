@@ -101,6 +101,7 @@ module.exports = {
         );
 
         //如果從目前的選擇清單選擇了，就清空目前的選擇清單，並且將目前的狀態改為沒有在等待
+        //目前的問題是，如果多人一起輸入的話會出問題
         this.candidates = [];
         return false;
       } else {
@@ -128,7 +129,7 @@ module.exports = {
           // 如果用新的關鍵字沒有找到歌，就不更新等待狀態跟選擇清單
           return isWaiting;
         }
-
+        message.channel.send(`> 使用 !p + 數字 來選歌`);
         // 如果用新的關鍵字找到了新歌，就清空目前的選擇清單重新填入，然後將等待狀態設成true
         this.candidates = [];
         video.forEach((v) => this.candidates.push(v.url));
