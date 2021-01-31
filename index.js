@@ -29,6 +29,7 @@ client.userWaiting = new Map();
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  await client.user.setActivity("!help", { type: "PLAYING" });
 
   // reading command files from commands folder
   const commandFiles = fs
