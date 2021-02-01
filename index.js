@@ -3,11 +3,14 @@ const fs = require("fs");
 const express = require("express");
 const path = require("path");
 const rawCommands = require(path.resolve(__dirname, "commands", "rawCommands"));
+const cors = require("cors");
 const app = express();
 dotenv.config();
 let port = process.env.PORT || 4000;
 let hasStart = false;
 const Discord = require("discord.js");
+
+app.use(cors());
 
 // 這邊目前有一個問題是，不同的伺服器給bot指令時會混在一起，一個解決辦法是帶入mongo db來分別記錄
 app.get("/", (req, res) => {
@@ -29,7 +32,9 @@ client.userWaiting = new Map();
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  await client.user.setActivity("!help", { type: "PLAYING" });
+  await client.user.setActivity("!help https://chiwawabot.herokuapp.com/", {
+    type: "PLAYING",
+  });
 
   // reading command files from commands folder
   const commandFiles = fs
