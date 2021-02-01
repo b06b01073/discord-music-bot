@@ -4,12 +4,14 @@ const express = require("express");
 const path = require("path");
 const rawCommands = require(path.resolve(__dirname, "commands", "rawCommands"));
 const cors = require("cors");
+const awake = require(path.resolve(__dirname, "awake.js"));
 const app = express();
 dotenv.config();
 let port = process.env.PORT || 4000;
 let hasStart = false;
 const Discord = require("discord.js");
 
+awake();
 app.use(cors());
 
 // 這邊目前有一個問題是，不同的伺服器給bot指令時會混在一起，一個解決辦法是帶入mongo db來分別記錄
