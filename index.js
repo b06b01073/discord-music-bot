@@ -8,7 +8,6 @@ const awake = require(path.resolve(__dirname, "awake.js"));
 const app = express();
 dotenv.config();
 let port = process.env.PORT || 4000;
-let hasStart = false;
 const Discord = require("discord.js");
 
 awake();
