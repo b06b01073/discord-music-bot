@@ -6,9 +6,22 @@ const rawCommands = require(path.resolve(__dirname, "commands", "rawCommands"));
 const cors = require("cors");
 const awake = require(path.resolve(__dirname, "awake.js"));
 const app = express();
-dotenv.config();
-let port = process.env.PORT || 4000;
 const Discord = require("discord.js");
+const mongoose = require("mongoose");
+dotenv.config();
+
+mongoose.connect(
+  process.env.MONGO_URL,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  () => {
+    console.log("MongoDB connected");
+  }
+);
+
+let port = process.env.PORT || 4000;
 
 awake();
 app.use(cors());
@@ -58,14 +71,17 @@ client.on("message", async (message) => {
   const userId = message.author.id;
   const raw = message.content;
 
-  if (rawCommands.execute(message, raw)) return;
+  // if (rawCommands.execute(message, raw)) return;
 
   // parsing command
   const args = message.content.slice(prefix.length).trim().split(/\s+/);
   const command = args.shift().toLowerCase();
 
   //確定command有prefix
-  if (!raw.startsWith(prefix)) return;
+  if (!raw.startsWith(prefix)) {
+    await rawCommands.execute(message, raw);
+    return;
+  }
 
   if (command === "ping") {
     if (client.commands.has("ping")) {
@@ -106,6 +122,10 @@ client.on("message", async (message) => {
     message.reply(
       `You can check **https://chiwawabot.herokuapp.com/** for more info.`
     );
+  } else if (command === "set") {
+    if (client.commands.has("set")) {
+      await client.commands.get("set").execute(message, args);
+    }
   }
 });
 

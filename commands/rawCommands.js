@@ -1,28 +1,35 @@
+const path = require("path");
+const CustomMessage = require(path.resolve(
+  __dirname,
+  "../models/CustomMessage"
+));
+
 module.exports = {
   name: "rawCommands",
   description: "Handle raw commands",
-  execute(message, raw) {
+  async execute(message, raw) {
     if (raw === "哭啊") {
-      message.reply("你是在哭吧");
-      return true;
+      return await message.reply("你是在哭吧");
     }
     if (raw === "好") {
-      message.reply("好");
-      return true;
+      return await message.reply("好");
     }
     if (raw.startsWith("嚶")) {
-      message.reply("嚶嚶嚶");
-      return true;
+      return await message.reply("嚶嚶嚶");
     }
     if (raw.startsWith("哈")) {
-      message.reply("嘻嘻");
-      return true;
+      return await message.reply("嘻嘻");
     }
     if (raw.startsWith("嘻嘻")) {
-      message.reply("哈");
-      return true;
+      return await message.reply("哈");
     }
 
-    return false;
+    await CustomMessage.findOne({ message: raw }, (err, customMessage) => {
+      if (err) {
+        return console.log(err);
+      } else {
+        return message.reply(customMessage.response);
+      }
+    });
   },
 };
