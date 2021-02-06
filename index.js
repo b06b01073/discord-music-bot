@@ -71,8 +71,6 @@ client.on("message", async (message) => {
   const userId = message.author.id;
   const raw = message.content;
 
-  // if (rawCommands.execute(message, raw)) return;
-
   // parsing command
   const args = message.content.slice(prefix.length).trim().split(/\s+/);
   const command = args.shift().toLowerCase();

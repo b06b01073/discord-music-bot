@@ -20,6 +20,8 @@ module.exports = {
         if (err) {
           return message.reply("新增失敗，或許是這個指令已經被使用過了:(");
         }
+
+        return message.reply("創建成功");
       }
     );
   },
