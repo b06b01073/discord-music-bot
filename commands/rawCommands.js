@@ -25,9 +25,7 @@ module.exports = {
     }
 
     await CustomMessage.findOne({ message: raw }, (err, customMessage) => {
-      if (err) {
-        return console.log(err);
-      } else {
+      if (!err && customMessage !== null) {
         return message.reply(customMessage.response);
       }
     });
