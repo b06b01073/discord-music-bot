@@ -5,26 +5,32 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@discordjs/opus": "^0.4.0",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "axios": "^0.21.1",
     "cors": "^2.8.5",
     "discord.js": "^12.5.1",
     "distube": "^2.8.8",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "ffmpeg-static": "^4.2.7",
+    "fontsource-roboto": "^4.0.0",
     "googleapis": "^67.0.0",
     "mongoose": "^5.11.15",
     "node-fetch": "^2.6.1",
     "nodemon": "^2.0.7",
+    "react-router-dom": "^5.2.0",
     "valid-url": "^1.0.9",
     "yt-search": "^2.5.2",
-    "ytdl-core": "^4.4.5"
+    "ytdl-core": "^4.8.3"
   },
   "engines": {
     "node": "14.12.0"

@@ -8,6 +8,11 @@ const awake = require(path.resolve(__dirname, "awake.js"));
 const app = express();
 const Discord = require("discord.js");
 const mongoose = require("mongoose");
+const CustomMessage = require(path.resolve(
+  __dirname,
+  "./models/CustomMessage"
+));
+
 dotenv.config();
 
 mongoose.connect(
@@ -15,6 +20,7 @@ mongoose.connect(
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
   },
   () => {
     console.log("MongoDB connected");
@@ -27,9 +33,28 @@ awake();
 app.use(cors());
 
 // 這邊目前有一個問題是，不同的伺服器給bot指令時會混在一起，一個解決辦法是帶入mongo db來分別記錄
-app.get("/", (req, res) => {
-  return res.sendFile(path.resolve(__dirname, "index.html"));
+
+
+app.get("/getCommands", async (req, res) => {
+  const commandList = await CustomMessage.find({}, (err, res) => {
+    if (err) {
+      return res
+        .status(500)
+        .send("Something went wrong, try to reload the page...");
+    }
+  });
+  return res.send(commandList);
 });
+
+if(process.env.NODE_ENV === 'production')
+{
+  app.use(express.static('./client/build'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  })
+}
+
 app.listen(port, () => {
   console.log(`server is running at port: ${port}`);
 });
@@ -46,7 +71,7 @@ client.userWaiting = new Map();
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  await client.user.setActivity("!help https://chiwawabot.herokuapp.com/", {
+  await client.user.setActivity("!help", {
     type: "PLAYING",
   });
 
@@ -124,6 +149,20 @@ client.on("message", async (message) => {
     if (client.commands.has("set")) {
       await client.commands.get("set").execute(message, args);
     }
+  }
+});
+
+client.on("voiceStateUpdate", async (oldState, newState) => {
+  //如果前面沒有加入頻道，或在同一個頻道裡面操作，則不會影響
+  if (
+    oldState.channelID !== oldState.guild.me.voice.channelID ||
+    newState.channelID === oldState.channelID
+  )
+    return;
+  if (oldState.channel.members.size === 1) {
+    client.queue = [];
+    client.title = [];
+    await oldState.channel.leave();
   }
 });
 

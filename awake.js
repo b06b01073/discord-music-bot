@@ -9,7 +9,7 @@ const awake = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, 1000 * 60 * 20);
+  }, 1000 * 60 * 21);
 };
 
 module.exports = awake;
