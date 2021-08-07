@@ -1,4 +1,7 @@
 # discord-bot
+這是一個discord機器人的app，最主要的功能是可以在對此bot輸入特定訊息後讓這個機器人到youtube上面抓音樂並在語音頻道撥放。
+
+主要是使用DiscordJS的API做出來的，搭配了簡單的mongodb讓使用者可以與機器人互動。
 
 ## Start Server
 
