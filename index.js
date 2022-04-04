@@ -34,7 +34,6 @@ app.use(cors());
 
 // 這邊目前有一個問題是，不同的伺服器給bot指令時會混在一起，一個解決辦法是帶入mongo db來分別記錄
 
-
 app.get("/getCommands", async (req, res) => {
   const commandList = await CustomMessage.find({}, (err, res) => {
     if (err) {
@@ -46,13 +45,12 @@ app.get("/getCommands", async (req, res) => {
   return res.send(commandList);
 });
 
-if(process.env.NODE_ENV === 'production')
-{
-  app.use(express.static('./client/build'));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("./client/build"));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  })
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
 }
 
 app.listen(port, () => {
@@ -88,7 +86,7 @@ client.once("ready", async () => {
 
 client.on("message", async (message) => {
   // 在server端記錄所有訊息
-  console.log(`[${message.author.tag}]:　${message.content}`);
+  console.log(`[${message.author.tag}]: ${message.content}`);
 
   // 不接收由機器人發出的訊息
   if (message.author.bot) return;

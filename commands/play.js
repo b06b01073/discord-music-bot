@@ -17,7 +17,7 @@ const idParser = require(path.resolve(__dirname, "utils", "idParser.js"));
 const playMusic = async (url, connection, queue, title, message) => {
   const stream = await ytdl(url, {
     filter: "audioonly",
-    quality: "lowestaudio",
+    quality: "highestaudio",
   });
 
   const id = idParser(url);
